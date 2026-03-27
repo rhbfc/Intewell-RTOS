@@ -1,0 +1,7 @@
+
+menu "Dependencies"
+
+orsource "fs/Kconfig"
+orsource "lwip/Kconfig"
+
+endmenu

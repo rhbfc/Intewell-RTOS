@@ -1,0 +1,43 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+include:
+  - ${YAML_ROOT}/dependencies.yaml
+  - ${YAML_ROOT}/arch/aarch64.yaml
+  - ${YAML_ROOT}/toolchains/aarch64-musl-gcc.yaml
+  - ${YAML_ROOT}/rootfs.yaml
+
+name: qemu_aarch64
+
+board:
+  variables:
+    CONFIG_SOFT_ARCH: aarch64
+    CONFIG_BOARD: qemu_aarch64
+    CONFIG_FILE:  qemu_aarch64_defconfig
+    DTB_FILE:     qemu_aarch64.dtb
+
+dependencies:
+  - name: kernel-libc
+    git: ${DEPS_GIT_ROOT}/components/libk.git
+    path: dependencies/libk
+    ref: new-cmake
+
+  - name: lwip
+    git: ${DEPS_GIT_ROOT}/third/lwip.git
+    path: dependencies/lwip
+    ref: origin/adaptive_for_intewell3.0
+
+  - name: fs
+    git: ${DEPS_GIT_ROOT}/components/libfs.git
+    path: dependencies/fs
+    ref: new-cmake
+
+rootfs:
+  name: rootfs_aarch64

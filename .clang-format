@@ -1,0 +1,124 @@
+---
+Language: ObjC
+BasedOnStyle: LLVM
+---
+Language: Cpp
+# 基础风格设置为LLVM
+BasedOnStyle: LLVM
+# 缩进宽度设置为4空格
+IndentWidth: 4
+# tab宽度为4
+TabWidth: 4
+# 禁止使用制表符
+UseTab: Never
+# 每行最大字符数
+ColumnLimit: 100
+# 连续空行的最大数量
+MaxEmptyLinesToKeep: 1
+
+# 大括号换行风格
+BreakBeforeBraces: Custom
+BraceWrapping:
+  # 函数定义后的大括号换行
+  AfterFunction: true
+  # 命名空间定义后的大括号换行
+  AfterNamespace: true
+  # 类定义后的大括号换行
+  AfterClass: true
+  # 结构体定义后的大括号换行
+  AfterStruct: true
+  # 枚举定义后的大括号换行
+  AfterEnum: true
+  # 控制语句后的大括号换行
+  AfterControlStatement: true
+  # if/else-if/else中的else换行
+  BeforeElse: true
+  # 在catch之前换行
+  BeforeCatch: true
+  # 缩进大括号
+  IndentBraces: false
+  # 空函数的大括号不换行
+  SplitEmptyFunction: true
+  # 空纪录（类、结构体等）的大括号不换行
+  SplitEmptyRecord: true
+  # 空命名空间的大括号不换行
+  SplitEmptyNamespace: true
+  # case标签后的大括号换行
+  AfterCaseLabel: true
+
+# 控制语句中的if，while等之后需要有空格
+SpaceBeforeParens: ControlStatements
+# 赋值操作符前后有空格
+SpaceBeforeAssignmentOperators: true
+# 二元操作符前后有空格
+SpacesInParentheses: false
+# 括号内不添加空格
+SpaceInEmptyParentheses: false
+# 方括号中不添加空格
+SpacesInSquareBrackets: false
+# 尖括号中不添加空格
+SpacesInAngles: false
+# 一元操作符之后没有空格
+SpaceAfterCStyleCast: false
+# 逻辑运算符前后有空格
+SpacesInContainerLiterals: false
+# 指针和引用的对齐
+PointerAlignment: Right
+# 引用对齐方式与指针一致
+ReferenceAlignment: Pointer
+
+# 对齐连续的赋值
+AlignConsecutiveAssignments: false
+# 对齐连续的声明
+AlignConsecutiveDeclarations: false
+# 对齐换行的反斜杠
+AlignEscapedNewlines: Right
+# 对齐二元和三元表达式的操作数
+AlignOperands: true
+# 允许短的if语句保持在同一行
+AllowShortIfStatementsOnASingleLine: false
+# 允许短的循环保持在同一行
+AllowShortLoopsOnASingleLine: false
+# 允许短的函数放在同一行，但只限于空函数
+AllowShortFunctionsOnASingleLine: Empty
+# 允许短语句放在同一行
+AllowShortBlocksOnASingleLine: false
+# 允许短case标签放在同一行
+AllowShortCaseLabelsOnASingleLine: false
+# 总是在template声明后换行
+AlwaysBreakTemplateDeclarations: Yes
+# 不总是在返回类型后换行
+AlwaysBreakAfterReturnType: None
+# 不总是在多行字符串前换行
+AlwaysBreakBeforeMultilineStrings: false
+
+# 在每个定义或声明前先放一个空行
+KeepEmptyLinesAtTheStartOfBlocks: false
+# 在return语句前添加空行
+EmptyLineBeforeAccessModifier: Always
+
+# 括号内紧跟内容，不要有空格
+#SpacesInParentheses: false
+# 方括号内紧跟内容，不要有空格
+#SpacesInSquareBrackets: false
+# 为空的括号添加空格
+#SpaceInEmptyParentheses: false
+
+# 注释前添加空格
+SpacesBeforeTrailingComments: 1
+
+# 不要使用tab缩进预处理指令
+IndentPPDirectives: None
+# 缩进预处理块
+PPIndentWidth: 4
+
+# 不继承最常见的缩进宽度
+DerivePointerAlignment: false
+# 不使用伪缩进(虚拟缩进)
+IndentWrappedFunctionNames: false
+# 不要缩进命名空间
+NamespaceIndentation: None
+
+# 在每个语句后添加分号
+InsertTrailingCommas: None
+---

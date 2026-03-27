@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+set(CMAKE_C_COMPILER_WORKS TRUE)
+set(CMAKE_CXX_COMPILER_WORKS TRUE)
+set(CMAKE_CROSSCOMPILING TRUE)
+
+set(CMAKE_C_COMPILER    ${TOOLCHAIN_PREFIX}gcc      CACHE STRING "target" FORCE)
+set(CMAKE_ASM_COMPILER  ${TOOLCHAIN_PREFIX}gcc      CACHE STRING "target" FORCE)
+set(CMAKE_OBJDUMP       ${TOOLCHAIN_PREFIX}objdump  CACHE STRING "target" FORCE)
+SET(CMAKE_CXX_COMPILER  ${TOOLCHAIN_PREFIX}g++      CACHE STRING "target" FORCE)
+SET(CMAKE_OBJCOPY       ${TOOLCHAIN_PREFIX}objcopy  CACHE STRING "target" FORCE)
+SET(CMAKE_AR            ${TOOLCHAIN_PREFIX}ar       CACHE STRING "target" FORCE)
+SET(CMAKE_AS            ${TOOLCHAIN_PREFIX}as       CACHE STRING "target" FORCE)
+SET(CMAKE_LD            ${TOOLCHAIN_PREFIX}ld       CACHE STRING "target" FORCE)
+SET(CMAKE_NM            ${TOOLCHAIN_PREFIX}nm       CACHE STRING "target" FORCE)
+SET(CMAKE_RANLIB        ${TOOLCHAIN_PREFIX}ranlib   CACHE STRING "target" FORCE)
+SET(CMAKE_STRIP         ${TOOLCHAIN_PREFIX}strip    CACHE STRING "target" FORCE)

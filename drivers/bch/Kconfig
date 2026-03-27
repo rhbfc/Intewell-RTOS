@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menuconfig BCH
+	bool "Block-to-Character (BCH) Support"
+	default n
+	---help---
+		Contains logic that may be used to convert a block driver into
+		a character driver.  This is the complementary conversion as that
+		performed by loop.c.  See include/nuttx/drivers/drivers.h for
+		registration information.
+
+if BCH
+
+config BCH_ENCRYPTION
+	bool "Enable BCH encryption"
+	default n
+	depends on CRYPTO_AES
+
+config BCH_ENCRYPTION_KEY_SIZE
+	int "AES key size"
+	default 16
+	depends on BCH_ENCRYPTION
+
+config BCH_BUFFER_ALIGNMENT
+	int "Buffer aligned bytes"
+	default 0
+
+endif # BCH

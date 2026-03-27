@@ -1,0 +1,80 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menuconfig TRACE
+    bool "System Tracing Support"
+    default n
+    help
+      Enable system-wide tracing functionality for debugging and performance
+      analysis. This provides detailed logs of system events.
+
+if TRACE
+
+config TRACE_BOOT
+    bool "Boot-time Tracing"
+    default n
+    help
+      Enable tracing from the earliest boot stage, before normal
+      subsystems are initialized.
+      This allows capturing trace data for early init functions,
+      system bring-up, and kernel start sequence.
+
+config TRACE_MARK
+    bool "Mark Point Tracing"
+    default y
+    help
+      Trace mark begin/end points for performance measurement.
+
+config TRACE_IRQ
+    bool "IRQ Tracing"
+    default y
+    help
+      Trace interrupt request events with timing information.
+
+config TRACE_SYSCALL
+    bool "System Call Tracing"
+    default y
+    help
+      Trace system call entries and exits.
+
+config TRACE_SIGNAL
+    bool "Signal Tracing"
+    default y
+    help
+      Trace signal generation and delivery events.
+
+config TRACE_COMPETE
+    bool "Trace Resource Competition"
+    depends on TRACE
+    default y
+    help
+      Trace resource competition and contention events. This includes:
+      - Mutex/semaphore acquisition and release
+      - Spinlock operations
+      - Resource waiting queues
+      - Priority inversion detection
+      - Deadlock potential warnings
+
+      This tracing helps identify performance bottlenecks and potential
+      deadlock situations in multi-threaded environments.
+
+config TRACE_LOG
+    bool "Log Tracing"
+    default y
+    help
+      Trace log messages with different severity levels.
+
+config TRACE_MEMORY
+    bool "Memory Allocation Tracing"
+    default y
+    help
+      Trace memory allocation and free operations.
+
+endif

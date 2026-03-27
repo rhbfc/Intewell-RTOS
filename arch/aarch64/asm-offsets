@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2026 Kyland Inc.
+ * Intewell-RTOS is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+#include <asm_offsets_build.h>
+#include <context.h>
+
+int main(void)
+{
+    DEFINE(S_X0,			        offsetof(struct arch_context, regs[0]));
+    DEFINE(S_X1,			        offsetof(struct arch_context, regs[1]));
+    DEFINE(S_FP,			        offsetof(struct arch_context, regs[29]));
+    DEFINE(S_LR,			        offsetof(struct arch_context, regs[30]));
+    DEFINE(S_CPACR,			        offsetof(struct arch_context, cpacr));
+    DEFINE(S_ESR,			        offsetof(struct arch_context, esr));
+    DEFINE(S_SP,			        offsetof(struct arch_context, sp));
+    DEFINE(S_ELR,			        offsetof(struct arch_context, elr));
+    DEFINE(S_SPSR,			        offsetof(struct arch_context, cpsr));
+    DEFINE(ARCH_CONTEXT_SIZE,		sizeof(struct arch_context));
+#ifdef _HARD_FLOAT_
+    DEFINE(S_FP_CONTEXT_START,		offsetof(struct arch_context, fpContext));
+    DEFINE(FP_CONTEXT_SIZE,		    sizeof(T_FPP_Context));
+#endif
+}

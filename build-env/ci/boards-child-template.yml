@@ -1,0 +1,109 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+.board_build_template:
+  stage: build
+  image: rtos-builder:latest
+  rules:
+    - when: on_success
+  before_script:
+    - echo machine 192.168.11.8 login $CI_REGISTRY_USER password $CI_REGISTRY_PASSWORD >> ~/.netrc
+    - cd "$CI_PROJECT_DIR"
+    - git config --global url."http://gitlab-ci-token:${CI_JOB_TOKEN}@172.17.1.249/".insteadOf "http://172.17.1.249/"
+    - rm -f .git/modules/*/index.lock
+    - rm -f .git/modules/*/*/index.lock
+    - rm -f .git/modules/*/*/*/index.lock
+    - export BOARD_CONFIG_PATH="${CI_BOARDS_CONFIG:-ci_boards.json}"
+    - |
+      if [ -n "${CI_BOARDS_JSON_B64:-}" ]; then
+        echo "$CI_BOARDS_JSON_B64" | base64 -d > .ci_boards.from_b64.json
+        export BOARD_CONFIG_PATH=".ci_boards.from_b64.json"
+      fi
+    - test -f "$BOARD_CONFIG_PATH"
+    - python3 --version
+    - cmake --version
+    - |
+      if command -v ninja >/dev/null; then
+        ninja --version
+      else
+        echo "ninja or ninja-build is required in runner image" >&2
+        exit 1
+      fi
+  script:
+    - mkdir -p build/artifacts
+    - bash build-env/ci/build_board_from_json.sh "$BOARD_CONFIG_PATH" "$BOARD_INDEX"
+  artifacts:
+    when: on_success
+    paths:
+      - out/$BOARD_PRESET/
+    expire_in: 1 day
+
+.board_test_template:
+  stage: test
+  image: rtos-builder:latest
+  allow_failure: true
+  rules:
+    - if: '$RUN_BOARD_TESTS == "true"'
+    - when: never
+  before_script:
+    - cd "$CI_PROJECT_DIR"
+    - python3 --version
+    - test -f "out/$BOARD_PRESET/rtos.bin"
+    - test -f "out/$BOARD_PRESET/rootfs.bin"
+  script:
+    - python3 build-env/ci/tests/run_qemu_tests.py --kernel "out/$BOARD_PRESET/rtos.bin" --arch "$TEST_ARCH" --timeout "${TEST_TIMEOUT:-${QEMU_TIMEOUT:-300}}" --rootfs "out/$BOARD_PRESET/rootfs.bin" --version "${TEST_VERSION:-latest}"
+  artifacts:
+    reports:
+      junit: test-results.xml
+    paths:
+      - test-results.xml
+      - test-output.log
+      - posix_test_case.elf
+    when: always
+    expire_in: 1 day
+
+.board_publish_template:
+  stage: package
+  image: rtos-builder:latest
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - when: never
+  before_script:
+    - cd "$CI_PROJECT_DIR"
+    - python3 --version
+    - test -d out
+  script:
+    - |
+      FTP_HOST="${ARTIFACTS_FTP_HOST:-192.168.11.41}"
+      FTP_PORT="${ARTIFACTS_FTP_PORT:-21}"
+      FTP_USER="${ARTIFACTS_FTP_USER:-CI}"
+      FTP_PASSWORD="${ARTIFACTS_FTP_PASSWORD:-123}"
+      REMOTE_PATH="${ARTIFACTS_REMOTE_PATH:-/${CI_COMMIT_TAG}}"
+      REMOTE_BASE="ftp://${FTP_HOST}:${FTP_PORT}${REMOTE_PATH%/}"
+      FAILED=0
+
+      while IFS= read -r -d '' FILE; do
+        REL_PATH="${FILE#out/}"
+        DEST_URL="${REMOTE_BASE}/${REL_PATH}"
+        echo "[upload] ${FILE} -> ${DEST_URL}"
+
+        if ! curl --fail --silent --show-error \
+          --disable-epsv \
+          --ftp-create-dirs \
+          --retry 3 --retry-delay 2 --retry-max-time 60 \
+          --user "${FTP_USER}:${FTP_PASSWORD}" \
+          -T "${FILE}" \
+          "${DEST_URL}"; then
+          echo "[upload] failed: ${FILE}" >&2
+          FAILED=1
+        fi
+      done < <(find out -type f -print0)
+
+      exit "${FAILED}"

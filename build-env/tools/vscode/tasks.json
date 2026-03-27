@@ -1,0 +1,118 @@
+/*
+ * Copyright (c) 2026 Kyland Inc.
+ * Intewell-RTOS is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "[TTOS] build",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\""
+            ],
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always",
+                "focus": true,
+                "close": false
+            },
+            "problemMatcher": [],
+        },
+        {
+            "label": "[TTOS] run",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "BUILD_DIR=\"${command:cmake.buildDirectory}\"; if [ ! -f \"$BUILD_DIR/rootfs.bin\" ]; then cmake --build \"$BUILD_DIR\" --target rootfs || exit $?; fi; export SUDO_ASKPASS=\"${workspaceFolder}/.vscode/askpass.sh\" && sudo -A cmake --build \"$BUILD_DIR\" --target run; exec bash"
+            ],
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always",
+                "focus": true,
+                "close": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] debug",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "BUILD_DIR=\"${command:cmake.buildDirectory}\"; if [ ! -f \"$BUILD_DIR/rootfs.bin\" ]; then cmake --build \"$BUILD_DIR\" --target rootfs || exit $?; fi; export SUDO_ASKPASS=\"${workspaceFolder}/.vscode/askpass.sh\" && sudo -A cmake --build \"$BUILD_DIR\" --target debug; exec bash"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] menuconfig",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\" --target menuconfig"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] img",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\" --target img"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] img-update",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\" --target updateimg"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] iso",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\" --target iso"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] sdk",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "cmake --build \"${command:cmake.buildDirectory}\" --target sdk"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "[TTOS] build + run",
+            "dependsOn": [
+                "[TTOS] build",
+                "[TTOS] run"
+            ],
+            "dependsOrder": "sequence"
+        },
+        
+    ]
+}

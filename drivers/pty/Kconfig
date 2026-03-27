@@ -1,0 +1,34 @@
+menuconfig PSEUDOTERM
+	bool "Pseudo-Terminal (PTY) support"
+	default n
+	select PIPES
+	select ARCH_HAVE_SERIAL_TERMIOS
+	---help---
+		Enable support support for master and slave pseudo-terminal devices.
+
+if PSEUDOTERM
+
+config PSEUDOTERM_SUSV1
+	bool "SUSv1 style"
+	default y
+	---help---
+		PTYs as specified in the Single Unix Specification (SUSv1).
+
+		Master: /dev/ptmx (multiplexor)
+		Slave: /dev/pts/N
+
+		Where N is the minor number
+
+config PSEUDOTERM_RXBUFSIZE
+	int "Pseudo-Terminal Rx buffer size"
+	default 256
+	---help---
+		Master-to-slave pipe buffer size.  Default: 256
+
+config PSEUDOTERM_TXBUFSIZE
+	int "Pseudo-Terminal Tx buffer size"
+	default 256
+	---help---
+		Slave-to-master pipe buffer size.  Default: 256
+
+endif # PSEUDOTERM

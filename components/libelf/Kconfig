@@ -1,0 +1,40 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+config ALLSYMS
+	bool "Load all symbols for debugging"
+	default n
+	---help---
+		Say Y here to let print out symbolic crash information and
+		symbolic stack backtraces. This increases the size of the
+		somewhat, as all symbols have to be loaded into the image.
+
+config SYMTAB_ORDEREDBYNAME
+	bool "Symbol Tables Ordered by Name"
+	default n
+	---help---
+		Select if the symbol table is ordered by symbol name.  In this case,
+		the logic can perform faster lookups using a binary search.
+		Otherwise, the symbol table is assumed to be un-ordered and only
+		slow, linear searches are supported.
+
+config SYMTAB_ORDEREDBYVALUE
+	bool "Symbol Tables Ordered by Value"
+	default n
+	---help---
+		Select if the symbol table is ordered by symbol value.
+
+config SYMTAB_DECORATED
+	bool "Symbols are decorated with leading underscores"
+	default n
+	---help---
+		Select if symbols in relocatable objects are decorated with a leading
+		underscore. This option will remove the underscore from symbol names
+		when relocating a loadable object.

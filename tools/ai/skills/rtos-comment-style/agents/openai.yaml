@@ -1,0 +1,4 @@
+interface:
+  display_name: "RTOS Comment Style"
+  short_description: "Kernel-style Chinese comment guidance for RTOS C code"
+  default_prompt: "Use this skill when adding or rewriting comments in RTOS C code. Prefer short, high-information Chinese block comments that explain invariants, encoding, layout, lifecycle, compatibility, and tricky branches. Avoid obvious restatements, Doxygen headers, and comment spam."

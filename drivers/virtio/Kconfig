@@ -1,0 +1,57 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+menuconfig DRIVERS_VIRTIO
+	bool "Virtio Device Support"
+	default n
+
+if DRIVERS_VIRTIO
+config VIRTIO_MMIO
+	bool "Virtio MMIO Support"
+	default y
+
+config DRIVERS_VIRTIO_MMIO_QUEUE_LEN
+	int "Queue length"
+	depends on VIRTIO_MMIO
+	default 256
+
+config VIRTIO_MMIO_BLK
+	bool "Virtio MMIO Block Support"
+	default y
+
+config VIRTIO_CONSOLE
+	bool "Virtio Console Support"
+	select SERIAL_TXDMA
+	select SERIAL_RXDMA
+	default y
+
+config VIRTIO_PCI
+	bool "Virtio Pci Support"
+	default y
+
+config VIRTIO_MMIO_NET
+	bool "Virtio MMIO Net Support"
+	depends on NETWORK
+	default y
+
+if VIRTIO_MMIO_NET
+config VIRTIO_NET_SUPPORT_AF_PACKET
+	bool "Enables The Use Of AF_PACKET Socket To Receive non-IP Protocol Packets"
+	default y
+	help
+	  Enables Virtio-Net To Receive non-IP Protocol Packets Using The AF_PACKET Socket.
+endif
+
+endif

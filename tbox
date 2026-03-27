@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+SCHEMA = "build-env/yaml/preset.schema.yaml"
+BOARD_DIR       = Path("boards-iprj")
+BOARD_EXT_DIR   = Path("boards-prj")
+
+GEN_PRESETS = "build-env/tools/gen_presets.py"
+EXT_SCRIPT = "build-env/tools/upboard_ext.py"
+KCFG_AUTO = "build-env/tools/kconfig_auto.py"
+VSCODE_TEMPLATE_DIR = Path("build-env/tools/vscode")
+VSCODE_TARGET_DIR = Path(".vscode")
+COMPLETION_SCRIPT = Path("build-env/tools/completion/tbox.bash")
+
+def find_ext_board_dirs():
+    """
+    扫描 BOARD_EXT_DIR/prj/boards
+    返回 List[str]
+    """
+    dirs = []
+
+    if not BOARD_EXT_DIR.is_dir():
+        return dirs
+
+    for pkg in sorted(BOARD_EXT_DIR.iterdir()):
+        if not pkg.is_dir():
+            continue
+
+        board_dir = pkg / "yaml"
+        if not board_dir.is_dir():
+            continue
+
+        dirs.append(str(board_dir))
+
+    return dirs
+
+
+def run(cmd):
+    subprocess.run(cmd, check=True)
+
+
+def usage():
+    print(
+        "Usage:\n"
+        "  tbox                     # normal mode\n"
+        "  tbox vscode              # copy vscode templates\n"
+        "  tbox completion          # print bash completion script\n"
+        "  tbox --ext [args]        # ext mode (must be first argument)\n"
+    )
+
+
+def copy_vscode_templates():
+    if not VSCODE_TEMPLATE_DIR.is_dir():
+        raise FileNotFoundError(f"vscode template directory not found: {VSCODE_TEMPLATE_DIR}")
+
+    VSCODE_TARGET_DIR.mkdir(parents=True, exist_ok=True)
+
+    copied = 0
+    skipped = 0
+    for src in sorted(VSCODE_TEMPLATE_DIR.rglob("*")):
+        rel = src.relative_to(VSCODE_TEMPLATE_DIR)
+        dst = VSCODE_TARGET_DIR / rel
+
+        if src.is_dir():
+            dst.mkdir(parents=True, exist_ok=True)
+            continue
+
+        if dst.exists():
+            print(f"[vscode] skip existing: {dst}")
+            skipped += 1
+            continue
+
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        print(f"[vscode] copied: {dst}")
+        copied += 1
+
+    print(f"[vscode] done, copied={copied}, skipped={skipped}")
+
+def run_gen_presets(extra_args):
+    board_dirs = [str(BOARD_DIR) + "/yaml"]
+    board_dirs += find_ext_board_dirs()
+
+    cmd = [
+        sys.executable,
+        GEN_PRESETS,
+    ]
+
+    if extra_args:
+        # 用户显式传参：完全透传
+        cmd += extra_args
+    else:
+        # 默认行为：schema + 所有 board_dirs
+        cmd += [
+            SCHEMA,
+            *board_dirs,
+        ]
+
+    subprocess.run(cmd, check=True)
+
+
+def print_completion(shell: str):
+    if shell != "bash":
+        print(f"[ERROR] unsupported shell for completion: {shell}", file=sys.stderr)
+        print("supported shells: bash", file=sys.stderr)
+        sys.exit(2)
+
+    if not COMPLETION_SCRIPT.is_file():
+        print(f"[ERROR] completion script not found: {COMPLETION_SCRIPT}", file=sys.stderr)
+        sys.exit(2)
+
+    print(COMPLETION_SCRIPT.read_text(encoding="utf-8"), end="")
+
+
+def main():
+    argv = sys.argv[1:]
+
+    # ---------- tbox 自身 help ----------
+    if argv and argv[0] in ("?", "-h", "--help"):
+        print(
+            "Usage:\n"
+            "  tbox [gen_presets args]\n"
+            "  tbox vscode\n"
+            "  tbox completion [bash]\n"
+            "  tbox --ext [ext args]\n\n"
+            "Examples:\n"
+            "  tbox\n"
+            "  tbox vscode\n"
+            "  source <(./tbox completion bash)\n"
+            "  tbox -f qemu-a9.yaml\n"
+            "  tbox --ext --list\n"
+            "  tbox --ext --offline-export /tmp/boards-prj.tar.gz\n"
+            "  tbox --ext --offline-import /tmp/boards-prj.tar.gz\n"
+        )
+        sys.exit(0)
+
+    if argv and argv[0] == "completion":
+        shell = argv[1] if len(argv) > 1 else "bash"
+        if len(argv) > 2:
+            print("[ERROR] 'completion' takes at most one argument", file=sys.stderr)
+            usage()
+            sys.exit(2)
+        print_completion(shell)
+        return
+
+    if argv and argv[0] == "vscode":
+        if len(argv) > 1:
+            print("[ERROR] 'vscode' command does not accept extra arguments", file=sys.stderr)
+            usage()
+            sys.exit(2)
+        copy_vscode_templates()
+        return
+
+
+    # ext 模式：--ext 必须是第一个参数
+    if argv and argv[0] == "--ext":
+        ext_args = argv[1:]  # 后续参数原样透传
+
+        run([
+            sys.executable,
+            EXT_SCRIPT,
+            *ext_args
+        ])
+        return
+
+    # 错误用法：--ext 出现在非第一个位置
+    if "--ext" in argv:
+        print("[ERROR] '--ext' must be the first argument", file=sys.stderr)
+        usage()
+        sys.exit(2)
+
+    # 错误用法：未知子命令（避免误透传到 gen_presets）
+    if argv and not argv[0].startswith("-"):
+        print(f"[ERROR] unknown command: {argv[0]}", file=sys.stderr)
+        usage()
+        sys.exit(2)
+
+    # ---------- normal 模式 ----------
+    if argv:
+        # 用户传参：透传（但不包括 help，因为已拦截）
+        run_gen_presets(argv)
+    else:
+        # ⭐ 无参数：默认 schema + builtin + ext boards
+        run_gen_presets([])
+
+        run([
+            sys.executable,
+            KCFG_AUTO,
+        ])
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except subprocess.CalledProcessError as e:
+        sys.exit(e.returncode)

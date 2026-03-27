@@ -1,0 +1,37 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menu "rootfs"
+
+choice
+    prompt "rootfs 初始化方法"
+    default ROOTFS_EXT4
+
+config ROOTFS_EXT4
+    bool "ext4fs"
+
+config ROOTFS_CPIO
+    bool "cpio init ramfs support"
+    select FS_RAMFS
+endchoice
+
+config INIT_PROCESS_NAME
+    string "init process name"
+    default "/sbin/init"
+
+config INITRAMFS_SOURCE
+    string "cpio initramfs path"
+    depends on ROOTFS_CPIO
+    default "./initrd.cpio.default"
+    help
+      必须指定cpio文件的路径，该文件将在编译时被链接进内核。
+      路径是相对于build目录的相对路径
+
+endmenu

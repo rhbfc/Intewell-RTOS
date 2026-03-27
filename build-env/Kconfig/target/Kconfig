@@ -1,0 +1,174 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menu "目标配置"
+
+    choice
+        prompt "编译器"
+        default TOOLCHAIN_CLANG
+
+        config TOOLCHAIN_CLANG
+            bool "clang"
+
+        config TOOLCHAIN_GCC
+            bool "gcc"
+    endchoice
+
+    config ARCH_ARMv7
+        bool
+        select ARM_32
+        default n
+
+    config ARCH_AARCH32
+        bool
+        select ARM_32
+        default n
+
+    config ARCH_AARCH64
+        bool
+        select ARM_64
+        default n
+
+    config ARCH_X86_64
+        bool
+        select X86_64
+        default n
+
+    config ARM_32
+        bool
+        select OS_LP32
+        select ARCH_ARM
+        default n
+
+    config ARM_64
+        bool
+        select OS_LP64
+        select ARCH_ARM
+        default n
+
+    config X86_64
+        bool
+        select OS_LP64
+        default n
+
+    config OS_LP32
+        bool
+        default n
+
+    config OS_LP64
+        bool
+        default n
+
+    config ARCH_ARM
+        bool
+        default n
+
+    choice
+        prompt "处理器架构"
+        default CHOICE_ARCH_AARCH64
+
+        config CHOICE_ARCH_ARMv7
+            bool "ARMv7-A"
+            select ARCH_ARMv7
+
+        config CHOICE_ARCH_AARCH32
+            bool "ARMv8-aarch32"
+        select ARCH_AARCH32
+
+        config CHOICE_ARCH_AARCH64
+            bool "ARMv8-aarch64"
+            select ARCH_AARCH64
+
+        config CHOICE_ARCH_X86_64
+            bool "x86_64"
+            select ARCH_X86_64
+    endchoice
+
+    if ARCH_AARCH64 || ARCH_AARCH32
+        choice
+            prompt "CPU"
+            default TARGET_CPU_CORTEX_A55
+
+            config TARGET_CPU_CORTEX_A55
+                bool "Cortex-A55"
+            config TARGET_CPU_CORTEX_A53
+                bool "Cortex-A53"
+        endchoice
+    endif
+
+    if ARCH_ARMv7
+        choice
+            prompt "CPU"
+            default TARGET_CPU_CORTEX_A15
+
+            config TARGET_CPU_CORTEX_A15
+                bool "Cortex-A15"
+            config TARGET_CPU_CORTEX_A9
+                bool "Cortex-A9"
+            config TARGET_CPU_CORTEX_A7
+                bool "Cortex-A7"
+        endchoice
+    endif
+
+config KERNEL_SPACE_START
+    hex "kernel space start address"
+    default 0xC0000000  if ARM_32
+    default 0xFFFF000000000000  if ARM_64
+    default 0xFFFF800000000000  if X86_64
+    help
+        This is for kernel start virtual address. Depends on the architecture:
+        - ARM 32-bit: 0xC0000000
+        - ARM 64-bit: 0xFFFF000000000000
+        - X86_64: 0xFFFF800000000000
+
+    config ARCH
+        string
+        default "aarch64" if ARCH_AARCH64
+        default "arm" if ARCH_AARCH32
+        default "arm" if ARCH_ARMv7
+        default "x86_64" if ARCH_X86_64
+
+    config SUB_ARCH
+        string
+        default "" if ARCH_AARCH64 || ARCH_AARCH32
+        default "x86_64" if ARCH_X86_64
+
+if ARCH_AARCH64 || ARCH_AARCH32 || ARCH_ARMv7
+    # ARM-family shared options now live under arm_common.
+    source "arch/arm_common/Kconfig"
+endif
+
+    config BUILD_OPTIMIZE
+        string "Optimize level for build"
+        default "0"
+
+    config BUILD_DEBUG_INFO
+        bool "debug info for build"
+        default y
+
+    menu "Hardware"
+        config ISR_STACK_SIZE
+            hex "Config isr stack size"
+            default 0x2000
+
+        config HARD_FLOAT
+            bool "Enable Hard Float Unit"
+            default y
+
+if ARCH_X86_64
+        config KERNEL_LOAD_PHYS_ADDR
+            hex "Kernel load physical address"
+            default 0x400000
+            help
+            This gives the physical address where the kernel image is loaded.
+endif
+    endmenu
+
+endmenu

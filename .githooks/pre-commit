@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -euo pipefail
+
+FILES=()
+
+for path in "$@"; do
+    case "$path" in
+        *.c|*.h)
+            FILES+=("$path")
+            ;;
+    esac
+done
+
+if [ ${#FILES[@]} -eq 0 ]; then
+    exit 0
+fi
+
+for cmd in dos2unix iconv clang-format file; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "❌ 错误: 未找到 '$cmd' 命令，请安装后再提交！"
+        exit 1
+    fi
+done
+
+for file_path in "${FILES[@]}"; do
+    if [ ! -f "$file_path" ]; then
+        echo "⚠️ 警告: 文件 '$file_path' 不存在，跳过..."
+        continue
+    fi
+
+    dos2unix "$file_path" >/dev/null
+
+    encoding=$(file -bi "$file_path" | sed -n 's/.*charset=\([^ ]*\).*/\1/p')
+    if [ -n "$encoding" ] && [ "$encoding" != "utf-8" ] && [ "$encoding" != "us-ascii" ]; then
+        tmp_file=$(mktemp)
+        iconv -f "$encoding" -t UTF-8//TRANSLIT "$file_path" -o "$tmp_file"
+        mv "$tmp_file" "$file_path"
+    fi
+
+    clang-format -i "$file_path"
+done
+
+echo "✅ 代码格式化完成，相关 C/C++ 文件已转换为 LF & UTF-8"

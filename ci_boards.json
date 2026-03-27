@@ -1,0 +1,37 @@
+{
+    "toolchains": {
+        "aarch64-musl": {
+            "url": "http://git.intewellos.com:8081/repository/download/Intewell-RTOS/toolchain/aarch64-linux-musl-cross.tgz",
+            "extract_to": "/opt",
+            "bin_path": "/opt/aarch64-linux-musl-cross/bin"
+        },
+        "arm-musl": {
+            "url": "http://git.intewellos.com:8081/repository/download/Intewell-RTOS/toolchain/arm-linux-musleabihf-cross.tgz",
+            "extract_to": "/opt",
+            "bin_path": "/opt/arm-linux-musleabihf-cross/bin"
+        },
+        "x86_64-musl": {
+            "url": "http://git.intewellos.com:8081/repository/download/Intewell-RTOS/toolchain/x86_64-linux-musl-cross.tgz",
+            "extract_to": "/opt",
+            "bin_path": "/opt/x86_64-linux-musl-cross/bin"
+        }
+    },
+    "global_pre": [
+        "./tbox"
+    ],
+    "global_post": [
+        "cmake --build --preset \"$BOARD_PRESET\" --target mkout"
+    ],
+    "boards": [
+        {
+            "desc": "qemu-aarch64",
+            "preset": "qemu_aarch64",
+            "toolchain": "aarch64-musl",
+            "test": {
+                "enabled": false,
+                "arch": "aarch64"
+            },
+            "pre": []
+        }
+    ]
+}

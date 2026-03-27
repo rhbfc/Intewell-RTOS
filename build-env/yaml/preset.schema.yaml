@@ -1,0 +1,91 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+# ============================================================
+# CMake Preset 生成规范（Schema）
+# 本文件定义：
+# 1. YAML 配置允许有哪些字段
+# 2. 每个字段如何映射到 CMakePresets.json
+# 3. 哪些字段是必须的，哪些是可选的
+# ============================================================
+
+version: 1
+
+preset:
+  # ----------------------------
+  # 必填字段（缺失直接报错）
+  # ----------------------------
+  required:
+    - name
+    - cmake.cache.CONFIG_CPU_ARCH
+    - board.variables.CONFIG_SOFT_ARCH
+
+  # ----------------------------
+  # 字段定义
+  # key: YAML 中的路径
+  # ----------------------------
+  fields:
+
+    # ===== Preset 名称 =====
+    name:
+      type: string
+      map_to: name
+      comment: "CMake Preset 的唯一名称"
+
+    description:
+      type: string
+      map_to: displayName
+      optional: true
+      comment: "Preset 的显示名称（VSCode 中可见）"
+
+    # ===== 构建输出目录 =====
+    build.build_dir:
+      type: string
+      map_to: binaryDir
+      comment: "构建输出目录"
+
+    build.type:
+      type: string
+      map_to: cacheVariables.CMAKE_BUILD_TYPE
+      optional: true
+      comment: "构建类型（Debug / Release）"
+
+    # ===== CMake 相关 =====
+    cmake.generator:
+      type: string
+      map_to: generator
+      optional: true
+      comment: "CMake Generator，例如 Ninja"
+
+    cmake.cache:
+      type: map
+      map_each_to: cacheVariables.*
+      optional: true
+      comment: "额外的 CMake Cache 变量"
+
+    # ===== 工具链 =====
+    toolchain.cmake_file:
+      type: string
+      map_to: cacheVariables.CMAKE_TOOLCHAIN_FILE
+      optional: true
+      comment: "工具链 CMake 文件路径"
+
+    # ===== 板级相关 =====
+    board.variables:
+      type: map
+      map_each_to: cacheVariables.*
+      optional: true
+      comment: "板级相关的 CMake 变量"
+
+    # ===== Git 依赖（自动 clone）=====
+    dependencies:
+      type: list
+      optional: true
+      comment: "Git 依赖列表，每一项是一个仓库"

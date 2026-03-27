@@ -1,0 +1,4 @@
+interface:
+  display_name: "功能拆分提交"
+  short_description: "按功能拆分工作区改动、隔离无关变更并生成中文 git 提交"
+  default_prompt: "Use $feature-split-zh-commit to split the current workspace changes into focused functional commits and write concise Chinese git commit messages."

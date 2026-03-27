@@ -1,0 +1,48 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+# Example CI file for another repository.
+# It triggers this repository's pipeline and passes a JSON file via CI_BOARDS_JSON_B64.
+
+stages:
+  - prepare
+  - trigger
+
+variables:
+  # Change to your current repository path (the repository containing this file set).
+  TTOS_CI_PROJECT: "your-group/ttos-n"
+  # Branch or tag in TTOS_CI_PROJECT.
+  TTOS_CI_REF: "main"
+  # JSON file path in the caller repository.
+  BOARDS_JSON_FILE: "ci_boards.json"
+
+prepare_ttos_boards_json:
+  stage: prepare
+  image: alpine:3.20
+  script:
+    - test -f "$BOARDS_JSON_FILE"
+    - printf 'CI_BOARDS_JSON_B64=%s\n' "$(base64 "$BOARDS_JSON_FILE" | tr -d '\n')" > ttos-trigger.env
+  artifacts:
+    reports:
+      dotenv: ttos-trigger.env
+
+trigger_ttos_ci:
+  stage: trigger
+  needs:
+    - job: prepare_ttos_boards_json
+      artifacts: true
+  trigger:
+    project: "$TTOS_CI_PROJECT"
+    branch: "$TTOS_CI_REF"
+    strategy: depend
+    forward:
+      pipeline_variables: true
+  variables:
+    CI_BOARDS_JSON_B64: "$CI_BOARDS_JSON_B64"

@@ -1,0 +1,51 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+rootfs:
+  - name: rootfs_arm32
+    arch: arm
+
+    source:
+      path: http://192.168.11.87/repository/download/Intewell-N/rootfs/arm/rootfs.bin
+
+    cache:
+      enable: true
+      key: rootfs-arm32
+
+    destination:
+      mode: copy
+
+
+  - name: rootfs_aarch64
+    arch: aarch64
+
+    source:
+      path: http://192.168.11.87/repository/download/Intewell-N/rootfs/aarch64/rootfs.bin
+
+    cache:
+      enable: true
+      key: rootfs-aarch64
+
+    destination:
+      mode: copy
+
+
+  - name: rootfs_x86_64
+    arch: x86_64
+
+    source:
+      path: http://192.168.11.87/repository/download/Intewell-N/rootfs/x86_64/rootfs.bin
+
+    cache:
+      enable: true
+      key: rootfs-x86_64
+
+    destination:
+      mode: copy

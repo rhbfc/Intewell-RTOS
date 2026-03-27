@@ -1,0 +1,187 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menuconfig NETWORK
+	bool "Network"
+	default y
+
+config TCPIP
+	bool "TCP/IP Stack"
+	depends on NETWORK
+	default y
+
+choice
+	prompt ""
+	depends on TCPIP
+	default LWIP_2_2_0
+
+	config LWIP_2_2_0
+		bool "LWIP 2.2.0"
+		---help---
+			Use LWIP 2.2.0
+		select LWIP_EXTERNAL_LIBC
+		select LWIP_IPV4
+		select LWIP_TCP
+		select LWIP_UDP
+		select LWIP_RAW
+		select LWIP_ARP
+		select LWIP_IGMP
+endchoice
+
+config MAX_NETIF_IPS
+	int "Maximum IP number for one device"
+	depends on NETWORK
+	default 32
+	---help---
+		Config how many IPs can be set on one device.
+
+config NETPKT_RESERVED_LEN
+	int "NETPKT Reserved Data Length"
+	depends on NETWORK
+	range 32 4096
+	default 64
+	---help---
+		Config Reserved Field Length in ETH_NETPKT, used for Save struct pbuf_cunstom Currently. Must be Greater than 64 Bytes!
+
+config NETPKT_ALIGNMENT_LEN
+	int "NETPKT Alignment Length"
+	depends on NETWORK
+	default 64
+	---help---
+		Config Alignment Length when Allocating NETPKT, It Should be Aligned with the CPU Cacheline.
+
+config ETH_RX_TASK_PRIORITY
+	int "Ethernet device RX task priority"
+	depends on NETWORK
+	default 20
+	---help---
+		Ethernet device RX task priority.
+
+config ETH_RX_TASK_STACK_SIZE
+	int "Ethernet device RX task stack size"
+	depends on NETWORK
+	default 65536
+	---help---
+		Ethernet device RX task stack size.
+
+config ETH_RX_TASK_BIND_CPU_CORE
+	bool "Bind Ethernet RX Task To CPU Core"
+	depends on NETWORK && SMP
+	default y
+
+config ETH_RX_TASK_AFFINITY
+	int "ethernet device RX task affinity"
+	depends on ETH_RX_TASK_BIND_CPU_CORE
+	default 1
+	---help---
+		ethernet device RX task affinity.
+
+config SUPPORT_PHY_MONITOR
+	bool "Support PHY Monitor"
+	depends on NETWORK
+	default y
+
+choice
+	prompt "Choice Monitor Manner"
+	depends on SUPPORT_PHY_MONITOR
+	default MONITOR_BY_WORK_QUEUE
+
+config MONITOR_BY_WORK_QUEUE
+	bool "Use Work Queue to Monitoring PHY"
+
+config MONITOR_BY_STANDLONE_TASK
+	bool "Use Standlone Task to Monitoring PHY"
+
+config PHY_MONITOR_TASK_PRIORITY
+	int "PHY monitor task priority"
+	depends on MONITOR_BY_STANDLONE_TASK
+	default 253
+	---help---
+		PHY monitor task priority.
+endchoice
+
+config PHY_MONITOR_CHECK_PERIOD
+	int "The interval at which the PHY monitor checks the PHY status, by seconds"
+	depends on SUPPORT_PHY_MONITOR
+	default 2
+	---help---
+		The interval at which the PHY monitor checks the PHY status, by seconds.
+
+config SUPPORT_AF_PACKET
+	bool "Support AF_PACKET Socket"
+	depends on NETWORK
+	default y
+
+config AF_PACKET_CACHEABLE_ENTRIES
+	int "Cacheble AF_PACKET Packets Entries"
+	depends on SUPPORT_AF_PACKET
+	default 4096
+
+choice
+	prompt "Choice Packet Type"
+	depends on SUPPORT_AF_PACKET
+	default SUPPORT_AF_PACKET_RECV_ARP
+
+config SUPPORT_AF_PACKET_RECV_NON_ARP_IP
+	bool "Support Receive Non-ARP/IP Packets"
+
+config SUPPORT_AF_PACKET_RECV_ARP
+	bool "Support Receive Non-IP and ARP Packets"
+
+config SUPPORT_AF_PACKET_RECV_ALL
+	bool "Support Receive All Packets"
+endchoice
+
+config SUPPORT_AF_CAN
+	bool "Support AF_CAN Socket"
+	depends on NETWORK
+	default y
+
+config SUPPORT_ARP_ANNOUNCEMENT
+	bool "Support ARP Announcement"
+	depends on NETWORK
+	default y
+
+config ARP_PHY_CHANGE_TO_LINKUP
+	bool "When the PHY Status Changes to Link UP"
+	depends on SUPPORT_ARP_ANNOUNCEMENT
+	default y
+
+config ARP_IP_ADDR_CHANGE
+	bool "When the IP Address Changes"
+	depends on SUPPORT_ARP_ANNOUNCEMENT
+	default y
+
+config SUPPORT_PCAP_TOOL
+	bool "Support use pcap tool to capture ethernet network packet"
+	depends on NETWORK
+	default y
+
+config PCAP_CACHEABLE_ENTRIES
+	int "pcap tool cacheable entries"
+	depends on SUPPORT_PCAP_TOOL
+	default 1024
+
+config USER_SHELL_NET_INIT
+	bool "Support network initialization in user shell"
+	depends on NETWORK
+	default y
+
+config UNIX_SOCKET
+	bool "local socket"
+	depends on NETWORK
+	default y
+
+config NET_LOCAL_VFS_PATH
+	string "Path to local sock"
+	depends on NETWORK
+	default "/dev/"
+	---help---
+		The path to where localsock will exist in the VFS namespace.

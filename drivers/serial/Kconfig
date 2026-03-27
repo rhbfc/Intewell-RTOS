@@ -1,0 +1,58 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menu "Serial"
+
+config SERIAL_TXDMA
+    bool "Serial TX DMA"
+    default n
+
+config SERIAL_RXDMA
+    bool "Serial RX DMA"
+    default n
+
+config UART_TX_BUF_SIZE
+    hex "Serial Tx Buf Size"
+    default 0x400
+
+config UART_RX_BUF_SIZE
+    hex "Serial Rx Buf Size"
+    default 0x400
+
+config UART_BAUD
+    int "Setial bandrate"
+    default 115200
+
+config UART_CLK
+    int "Setial clk"
+    default 24000000
+
+config UART_PL011
+    bool "ARM PL011 UART driver"
+    depends on !QEMU_X86_64
+    default y if !QEMU_X86_64
+    help
+      This selects the ARM(R) AMBA(R) PrimeCell PL011 UART.
+
+config UART_I8250
+    bool "x86_64 i8250 uart driver"
+    depends on ARCH_X86_64
+    default y if ARCH_X86_64
+    help
+        Enable support for the i8250 UART driver on x86_64 systems.
+
+config FORCE_COM_NR
+    int "Force COM numbers"
+    default 0
+    depends on UART_I8250
+    help
+        Force register UART in x86_64
+
+endmenu

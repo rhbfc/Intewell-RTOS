@@ -1,0 +1,34 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+toolchain:
+  name: x86_64-linux-musl
+  type: cross
+
+cmake:
+  cache:
+    # ============================
+    # CMake 交叉编译三件套
+    # ============================
+    CMAKE_SYSTEM_NAME: Generic
+    CMAKE_SYSTEM_PROCESSOR: x86_64
+
+    # ============================
+    # 工具链前缀
+    # ============================
+    TOOLCHAIN_PREFIX: x86_64-linux-musl-
+    CMAKE_TOOLCHAIN_FILE: build-env/cmake/toolchain.cmake
+
+    # ============================
+    # 查找路径策略
+    # ============================
+    CMAKE_FIND_ROOT_PATH_MODE_PROGRAM: NEVER
+    CMAKE_FIND_ROOT_PATH_MODE_INCLUDE: ONLY
+    CMAKE_FIND_ROOT_PATH_MODE_PACKAGE: ONLY

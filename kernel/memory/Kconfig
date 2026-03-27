@@ -1,0 +1,77 @@
+# Copyright (c) 2026 Kyland Inc.
+# Intewell-RTOS is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+menu "memory"
+
+choice
+    prompt "memory alloc algorithm"
+    default TLSF
+	
+config TLSF
+    bool "tlsf"
+
+config WORKSPACE
+    bool "ttosworkspace"
+
+config SLUB
+    bool "Slub"
+	
+endchoice
+
+if !SLUB
+
+config KERNEL_HEAP_SIZE
+    hex "kernel heap size"
+    default 0x10000000
+
+config KERNEL_NC_HEAP_SIZE
+    hex "kernel DMA heap size"
+    default 0x100000
+
+endif
+
+config MM_UBSAN
+	bool "Undefined Behavior Sanitizer"
+	default n
+	---help---
+		UBSan is a fast undefined behavior detector. UBSan modifies
+		the program at compile-time to catch various kinds of
+		undefined behavior during program execution
+
+config MM_UBSAN_ALL
+	bool "Enable UBSan for the entire image"
+	depends on MM_UBSAN
+	default y
+	---help---
+		This option activates UBSan instrumentation for the
+		entire image. If you don't enable this option, you have to
+		explicitly specify "-fsanitize=undefined" for
+		the files/directories you want to check. Enabling this option
+		will get image size increased and performance decreased
+		significantly.
+
+config MM_UBSAN_OPTION
+	string "UBSan options"
+	depends on MM_UBSAN
+	default "-fsanitize=undefined"
+	---help---
+		This option activates specified UBSan instrumentation. Please
+		refer to https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+		for available options.
+
+config MM_UBSAN_TRAP_ON_ERROR
+	bool "Enable UBSan trap on error to crash immediately"
+	depends on MM_UBSAN
+	default n
+	---help---
+		The undefined instruction trap should cause your program to crash,
+		save the code space significantly.
+
+endmenu
