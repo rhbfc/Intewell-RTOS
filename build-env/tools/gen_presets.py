@@ -352,7 +352,7 @@ def main():
         })
 
     cmake_presets = {
-        "version": 4,
+        "version": 3,
         "configurePresets": configure_presets,
         "buildPresets": build_presets
     }
