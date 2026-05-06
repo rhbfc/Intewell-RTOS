@@ -914,7 +914,7 @@ static pfn_t setup_page_area(phys_addr_t start, phys_addr_t end)
  */
 unsigned long ttos_memblk_release_mem_to_pagealloc(void)
 {
-    struct ttos_memblk_region ranges[MEMBLOCK_MAX_ITER_RANGES];
+    static struct ttos_memblk_region ranges[MEMBLOCK_MAX_ITER_RANGES];
     unsigned long count = 0;
     unsigned long i;
     unsigned long range_count;
